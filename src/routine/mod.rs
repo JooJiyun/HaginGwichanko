@@ -3,7 +3,7 @@ use std::{
     thread,
 };
 
-use crate::system::TerminateThread;
+use crate::system::TerminateThreadEvent;
 
 pub struct RoutineInfo {
     routine_name: String,
@@ -14,8 +14,8 @@ pub enum RoutineBlock {
     Click,
 }
 
-pub fn run_routine(routine_info: RoutineInfo) -> Sender<TerminateThread> {
-    let (sender, receiver) = channel::<TerminateThread>();
+pub fn run_routine(routine_info: RoutineInfo) -> Sender<TerminateThreadEvent> {
+    let (sender, receiver) = channel::<TerminateThreadEvent>();
 
     let thread_builder = thread::Builder::new().name(routine_info.routine_name.clone());
     let thread_handle_result = thread_builder.spawn(move || {
@@ -29,7 +29,7 @@ pub fn run_routine(routine_info: RoutineInfo) -> Sender<TerminateThread> {
     return sender;
 }
 
-fn run_routine_inner(routine_info: RoutineInfo, receiver: Receiver<TerminateThread>) {
+fn run_routine_inner(routine_info: RoutineInfo, receiver: Receiver<TerminateThreadEvent>) {
     loop {
         // 오직 종료만 receiver로 받음
         if let Ok(_) = receiver.try_recv() {
