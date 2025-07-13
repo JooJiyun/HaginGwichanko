@@ -1,4 +1,4 @@
-# RoutineIt
+# Hagin Gwichanko
 
 **Windows UI 자동화 도구 (개발 중)**  
 커서 클릭, 드래그, 복사/붙여넣기 같은 반복 작업을 자동화하는 경량 툴입니다.

@@ -978,6 +978,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "hagin_gwichanko"
+version = "0.1.0"
+dependencies = [
+ "embed-resource",
+ "image",
+ "tray-icon",
+ "uiautomation",
+ "widestring",
+ "windows 0.54.0",
+ "winit",
+]
+
+[[package]]
 name = "half"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2131,19 +2144,6 @@ name = "rgb"
 version = "0.8.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a457e416a0f90d246a4c3288bd7a25b2304ca727f253f95be383dd17af56be8f"
-
-[[package]]
-name = "routine_it"
-version = "0.1.0"
-dependencies = [
- "embed-resource",
- "image",
- "tray-icon",
- "uiautomation",
- "widestring",
- "windows 0.54.0",
- "winit",
-]
 
 [[package]]
 name = "rustc_version"

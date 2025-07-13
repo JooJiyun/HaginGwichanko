@@ -1,7 +1,7 @@
 // 릴리즈 환경에서 콘솔 나오지 않도록 막기
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use routine_it::{
+use hagin_gwichanko::{
     contexted_err, show_error_with_terminate,
     system::{self, single_instance::is_single_instance},
     SResult,

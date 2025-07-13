@@ -2,7 +2,7 @@ mod routine;
 pub mod system;
 mod ui;
 
-const APP_NAME: &str = "RoutineIt";
+const APP_NAME: &str = "Hagin Gwichanko";
 
 /// 작업의 결과를 나타내는 표준 반환 타입
 ///
