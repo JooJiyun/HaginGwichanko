@@ -1,51 +1,56 @@
-use uiautomation::{UIAutomation, UIElement, UITreeWalker};
+use iced_core::Length::Fill;
+use iced_core::{color, Color, Element, Padding, Theme};
+use iced_wgpu::Renderer;
+use iced_widget::{column, container, row, text};
 
-use crate::{contexted_err, SResult};
+use crate::system::view_func::{ProcessRootViewElement, ViewElementNode};
+use crate::system::UIEvent;
 
-fn print_all_element() -> SResult<()> {
-    // get root ui
-    let automation: UIAutomation =
-        UIAutomation::new().or_else(|e| contexted_err!("failed get ui viewer", e))?;
-    let root = automation
-        .get_root_element()
-        .or_else(|e| contexted_err!("failed get ui viewer root", e))?;
-    let walker = automation
-        .create_tree_walker()
-        .or_else(|e| contexted_err!("failed get ui viewer walker", e))?;
+const TREE_ITEM_ROOT_PADDING: Padding = Padding {
+    top: 10.,
+    right: 10.,
+    bottom: 10.,
+    left: 10.,
+};
 
-    // get process root ui element
-    let process_ui_roots = automation
-        .create_matcher()
-        .from(root)
-        .timeout(10000)
-        .find_all()
-        .or_else(|e| contexted_err!("failed get processes ui", e))?;
+const TREE_ITEM_DEPTH_PADDING: Padding = Padding {
+    top: 0.,
+    right: 0.,
+    bottom: 0.,
+    left: 10.,
+};
 
-    // get text
-    for process_ui_root in process_ui_roots {
-        print_element_recursive(&walker, &process_ui_root, 1)?;
-    }
-
-    Ok(())
+pub fn view(
+    process_root_view_element: &ProcessRootViewElement,
+) -> Element<'static, UIEvent, Theme, Renderer> {
+    container(column![
+        text(process_root_view_element.process_name.clone()).color(Color::BLACK),
+        view_element_recursive(&process_root_view_element.root_node)
+    ])
+    .padding(TREE_ITEM_ROOT_PADDING)
+    .style(view_tree_container_style)
+    .into()
 }
 
-fn print_element_recursive(
-    walker: &UITreeWalker,
-    element: &UIElement,
-    level: usize,
-) -> SResult<()> {
-    println!("{:?} {:?}", level, element);
-
-    // 자식 탐색
-    if let Ok(child) = walker.get_first_child(&element) {
-        print_element_recursive(walker, &child, level + 1)?;
-
-        let mut next = child;
-        while let Ok(sibling) = walker.get_next_sibling(&next) {
-            print_element_recursive(walker, &sibling, level + 1)?;
-            next = sibling;
-        }
+fn view_element_recursive(
+    element_node: &ViewElementNode,
+) -> Element<'static, UIEvent, Theme, Renderer> {
+    let mut element_row = row![];
+    for child_element_node in &element_node.childs {
+        element_row = element_row.push(view_element_recursive(child_element_node));
     }
 
-    Ok(())
+    container(element_row)
+        .padding(TREE_ITEM_DEPTH_PADDING)
+        .align_bottom(Fill)
+        .style(view_tree_container_style)
+        .into()
+}
+
+fn view_tree_container_style(_theme: &Theme) -> iced_widget::container::Style {
+    iced_widget::container::Style {
+        text_color: Some(color!(0x564578)),
+        background: Some(iced_core::Background::Color(color!(0x375786))),
+        ..Default::default()
+    }
 }

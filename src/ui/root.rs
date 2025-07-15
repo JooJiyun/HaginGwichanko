@@ -4,7 +4,7 @@ use iced_winit::core::{Color, Element, Length::*, Theme};
 
 use crate::system::data::SystemData;
 use crate::system::UIEvent;
-use crate::ui::style::transparent_container;
+use crate::ui::style_utils::transparent_container;
 
 pub fn view(system_data: &SystemData) -> Element<'static, UIEvent, Theme, Renderer> {
     container(

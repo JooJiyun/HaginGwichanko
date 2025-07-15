@@ -1,3 +1,3 @@
 pub mod root;
-mod style;
+mod style_utils;
 mod viewer;

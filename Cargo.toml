@@ -17,6 +17,7 @@ iced_core = "0.13"
 chrono = "0.4"
 bytemuck = "1.15.0"
 glam = { version="0.27.0", features=[ "bytemuck" ] }
+sysinfo = "0.36.0"
 
 [build-dependencies]
 embed-resource = "3.0.2"
