@@ -1,10 +1,10 @@
 pub mod core;
-pub mod routine_state;
+pub mod data;
+pub mod routine;
 pub mod single_instance;
-pub mod system_data;
-mod system_tray;
-mod ui_context;
-pub mod view_state;
+pub mod tray;
+pub mod ui;
+pub mod view;
 
 pub enum AppEvent {
     SystemTrayEvent(tray_icon::menu::MenuEvent),
@@ -25,6 +25,12 @@ pub enum WidgetScene {
     RoutineList,
     RoutineDetail(usize),
     RoutineNew,
+}
+
+impl Into<UIEvent> for WidgetScene {
+    fn into(self) -> UIEvent {
+        UIEvent::OpenWidgetScene(self)
+    }
 }
 
 #[derive(Debug, Clone)]

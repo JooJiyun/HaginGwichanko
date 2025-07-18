@@ -3,9 +3,9 @@ use iced_core::{Color, Element, Padding, Theme};
 use iced_wgpu::Renderer;
 use iced_widget::{column, container, row, text};
 
-use crate::system::view_state::{RootViewElement, ViewElementNode};
+use crate::system::view::{RootViewElement, ViewElementNode};
 use crate::system::UIEvent;
-use crate::ui::style_utils::default_container_style;
+use crate::ui::styles::default_container_style;
 
 const TREE_ITEM_ROOT_PADDING: Padding = Padding {
     top: 10.,
@@ -22,7 +22,7 @@ const TREE_ITEM_DEPTH_PADDING: Padding = Padding {
 };
 
 pub fn view(
-    system_data: &crate::system::system_data::SystemData,
+    system_data: &crate::system::data::SystemData,
 ) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
     let mut view_trees = iced_widget::row![];
     for process_root_view_element in &system_data.view_tree_processes {

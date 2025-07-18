@@ -4,25 +4,25 @@ use iced_wgpu::Renderer;
 use iced_winit::core::{Element, Theme};
 use iced_winit::runtime::{Program, Task};
 
-use crate::system::system_data::SystemData;
+use crate::system::data::SystemData;
 use crate::system::UIEvent;
 use crate::ui::root::view;
 
-pub struct UIContext {
+pub struct APPUI {
     pub messages: Vec<UIEvent>,
     pub system_data: Arc<Mutex<SystemData>>,
 }
 
-impl UIContext {
-    pub fn new(data: Arc<Mutex<SystemData>>) -> UIContext {
-        UIContext {
+impl APPUI {
+    pub fn new(data: Arc<Mutex<SystemData>>) -> APPUI {
+        APPUI {
             messages: vec![],
             system_data: data,
         }
     }
 }
 
-impl Program for UIContext {
+impl Program for APPUI {
     type Theme = Theme;
     type Message = UIEvent;
     type Renderer = Renderer;

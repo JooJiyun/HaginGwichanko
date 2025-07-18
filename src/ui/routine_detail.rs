@@ -1,11 +1,9 @@
 use iced_widget::{button, column, row, text};
 
-use crate::system::routine_state::RoutineMethod;
-use crate::system::system_data::SystemData;
-use crate::ui::style_utils::default_container_style;
-
-const TEXT_MODIFY: &str = "modify";
-const TEXT_BACK: &str = "back";
+use crate::system::data::SystemData;
+use crate::system::routine::RoutineMethod;
+use crate::ui::const_text::*;
+use crate::ui::styles::default_container_style;
 
 pub fn view(
     system_data: &SystemData,

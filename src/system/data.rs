@@ -1,4 +1,7 @@
-use crate::system::{routine_state::RoutineInfo, view_state::RootViewElement, WidgetScene};
+use crate::system::{
+    {routine::RoutineInfo, view::RootViewElement},
+    WidgetScene,
+};
 
 #[derive(Clone, Debug, Default)]
 pub struct SystemData {

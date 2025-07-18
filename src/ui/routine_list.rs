@@ -2,16 +2,11 @@ use iced_core::{Element, Theme};
 use iced_wgpu::Renderer;
 use iced_widget::{button, column, container, row, text};
 
-use crate::system::routine_state::RoutineInfo;
-use crate::system::system_data::SystemData;
-use crate::system::{RoutineChangeEvent, UIEvent};
-use crate::ui::style_utils::default_container_style;
-
-const TEXT_RUN_AT_STARTUP: &str = "run at startup";
-const TEXT_NOT_RUN_AT_STARTUP: &str = "not run at startup";
-const TEXT_RUN: &str = "run";
-const TEXT_STOP: &str = "stop";
-const TEXT_DELETE: &str = "delete";
+use crate::system::data::SystemData;
+use crate::system::routine::RoutineInfo;
+use crate::system::{RoutineChangeEvent, UIEvent, WidgetScene};
+use crate::ui::const_text::*;
+use crate::ui::styles::*;
 
 pub fn view(
     system_data: &SystemData,
@@ -34,25 +29,33 @@ fn routine_item_view(
             text(routine_info.created_at.clone()),
             text(routine_info.last_modified.clone()),
         ],
+        button(text(TEXT_DETAIL))
+            .style(default_button_style)
+            .on_press(WidgetScene::RoutineDetail(routine_index).into()),
         //
         if routine_info.run_at_startup {
             button(text(TEXT_RUN_AT_STARTUP))
+                .style(green_button_style)
                 .on_press(RoutineChangeEvent::SetRunWithStartup(true).with_into(routine_index))
         } else {
             button(text(TEXT_NOT_RUN_AT_STARTUP))
-                .on_press(RoutineChangeEvent::SetRunWithStartup(true).with_into(routine_index))
+                .style(gray_button_style)
+                .on_press(RoutineChangeEvent::SetRunWithStartup(false).with_into(routine_index))
         },
         //
         if routine_info.is_running {
             button(text(TEXT_STOP))
-                .on_press(RoutineChangeEvent::SetRunWithStartup(true).with_into(routine_index))
+                .style(red_button_style)
+                .on_press(RoutineChangeEvent::Stop.with_into(routine_index))
         } else {
             button(text(TEXT_RUN))
-                .on_press(RoutineChangeEvent::SetRunWithStartup(true).with_into(routine_index))
+                .style(green_button_style)
+                .on_press(RoutineChangeEvent::Run.with_into(routine_index))
         },
         //
         button(text(TEXT_DELETE))
-            .on_press(RoutineChangeEvent::SetRunWithStartup(true).with_into(routine_index)),
+            .style(red_button_style)
+            .on_press(RoutineChangeEvent::Delete.with_into(routine_index)),
     ])
     .style(default_container_style)
     .into()

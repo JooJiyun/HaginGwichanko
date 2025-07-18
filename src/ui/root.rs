@@ -1,10 +1,10 @@
 use iced_wgpu::Renderer;
 use iced_widget::container;
-use iced_winit::core::{Element, Length::*, Theme};
+use iced_winit::core::{Element, Theme};
 
-use crate::system::system_data::SystemData;
+use crate::system::data::SystemData;
 use crate::system::UIEvent;
-use crate::ui::style_utils::default_container_style;
+use crate::ui::styles::default_container_style;
 use crate::ui::{loading, routine_detail, routine_list, routine_new};
 
 pub fn view(system_data: &SystemData) -> Element<'static, UIEvent, Theme, Renderer> {

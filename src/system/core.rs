@@ -23,12 +23,12 @@ use iced_winit::winit;
 use iced_winit::Clipboard;
 
 use crate::show_error_with_terminate;
-use crate::system::system_data::SystemData;
-use crate::system::system_tray::{self, SystemTrayHandle};
-use crate::system::{ui_context, AppEvent, TerminateThreadEvent};
+use crate::system::data::SystemData;
+use crate::system::tray::{self, SystemTrayHandle};
+use crate::system::{ui, AppEvent, TerminateThreadEvent};
 
 pub struct App {
-    system_tray_handle: system_tray::SystemTrayHandle,
+    system_tray_handle: tray::SystemTrayHandle,
     visual_state: VisualState,
     routine_senders: Vec<Sender<TerminateThreadEvent>>,
     data: Arc<Mutex<SystemData>>,
@@ -44,7 +44,7 @@ enum VisualState {
         format: wgpu::TextureFormat,
         engine: Engine,
         renderer: Renderer,
-        state: program::State<ui_context::UIContext>,
+        state: program::State<ui::APPUI>,
         cursor_position: Option<winit::dpi::PhysicalPosition<f64>>,
         clipboard: Clipboard,
         viewport: Viewport,
@@ -235,11 +235,11 @@ impl ApplicationHandler<AppEvent> for App {
         match event {
             AppEvent::SystemTrayEvent(menu_event) => {
                 match self.system_tray_handle.parse_event(menu_event) {
-                    system_tray::SystemTrayEvent::Open => self.open(event_loop),
-                    system_tray::SystemTrayEvent::Quit => self.quit(event_loop),
-                    system_tray::SystemTrayEvent::Start => self.start(),
-                    system_tray::SystemTrayEvent::Stop => self.stop(),
-                    system_tray::SystemTrayEvent::Invalid => show_message("", "Warning"),
+                    tray::SystemTrayEvent::Open => self.open(event_loop),
+                    tray::SystemTrayEvent::Quit => self.quit(event_loop),
+                    tray::SystemTrayEvent::Start => self.start(),
+                    tray::SystemTrayEvent::Stop => self.stop(),
+                    tray::SystemTrayEvent::Invalid => show_message("", "Warning"),
                 }
             }
         }
@@ -334,7 +334,7 @@ impl App {
         );
 
         // Initialize scene and GUI controls
-        let controls = ui_context::UIContext::new(self.data.clone());
+        let controls = ui::APPUI::new(self.data.clone());
 
         // Initialize iced
         let mut debug = Debug::new();
