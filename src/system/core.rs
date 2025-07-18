@@ -23,7 +23,7 @@ use iced_winit::winit;
 use iced_winit::Clipboard;
 
 use crate::show_error_with_terminate;
-use crate::system::data::SystemData;
+use crate::system::system_data::SystemData;
 use crate::system::system_tray::{self, SystemTrayHandle};
 use crate::system::{ui_context, AppEvent, TerminateThreadEvent};
 

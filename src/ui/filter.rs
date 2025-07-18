@@ -1,10 +1,11 @@
 use iced_core::Length::Fill;
-use iced_core::{color, Color, Element, Padding, Theme};
+use iced_core::{Color, Element, Padding, Theme};
 use iced_wgpu::Renderer;
 use iced_widget::{column, container, row, text};
 
-use crate::system::view_func::{ProcessRootViewElement, ViewElementNode};
+use crate::system::view_state::{RootViewElement, ViewElementNode};
 use crate::system::UIEvent;
+use crate::ui::style_utils::default_container_style;
 
 const TREE_ITEM_ROOT_PADDING: Padding = Padding {
     top: 10.,
@@ -21,14 +22,25 @@ const TREE_ITEM_DEPTH_PADDING: Padding = Padding {
 };
 
 pub fn view(
-    process_root_view_element: &ProcessRootViewElement,
+    system_data: &crate::system::system_data::SystemData,
+) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
+    let mut view_trees = iced_widget::row![];
+    for process_root_view_element in &system_data.view_tree_processes {
+        view_trees = view_trees.push(filter_tree_view(process_root_view_element));
+    }
+
+    iced_widget::container(view_trees).padding(0).into()
+}
+
+fn filter_tree_view(
+    process_root_view_element: &RootViewElement,
 ) -> Element<'static, UIEvent, Theme, Renderer> {
     container(column![
         text(process_root_view_element.process_name.clone()).color(Color::BLACK),
         view_element_recursive(&process_root_view_element.root_node)
     ])
     .padding(TREE_ITEM_ROOT_PADDING)
-    .style(view_tree_container_style)
+    .style(default_container_style)
     .into()
 }
 
@@ -36,6 +48,15 @@ fn view_element_recursive(
     element_node: &ViewElementNode,
 ) -> Element<'static, UIEvent, Theme, Renderer> {
     let mut element_row = row![];
+
+    // push self
+    element_row = element_row.push(
+        container(column![text(element_node.info.name.clone()).color(Color::BLACK),].spacing(10))
+            .padding(0)
+            .style(default_container_style),
+    );
+
+    // push childs
     for child_element_node in &element_node.childs {
         element_row = element_row.push(view_element_recursive(child_element_node));
     }
@@ -43,14 +64,5 @@ fn view_element_recursive(
     container(element_row)
         .padding(TREE_ITEM_DEPTH_PADDING)
         .align_bottom(Fill)
-        .style(view_tree_container_style)
         .into()
-}
-
-fn view_tree_container_style(_theme: &Theme) -> iced_widget::container::Style {
-    iced_widget::container::Style {
-        text_color: Some(color!(0x564578)),
-        background: Some(iced_core::Background::Color(color!(0x375786))),
-        ..Default::default()
-    }
 }

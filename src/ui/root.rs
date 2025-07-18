@@ -1,21 +1,20 @@
 use iced_wgpu::Renderer;
-use iced_widget::{button, column, container, text};
-use iced_winit::core::{Color, Element, Length::*, Theme};
+use iced_widget::container;
+use iced_winit::core::{Element, Length::*, Theme};
 
-use crate::system::data::SystemData;
+use crate::system::system_data::SystemData;
 use crate::system::UIEvent;
-use crate::ui::style_utils::transparent_container;
+use crate::ui::style_utils::default_container_style;
+use crate::ui::{loading, routine_detail, routine_list, routine_new};
 
 pub fn view(system_data: &SystemData) -> Element<'static, UIEvent, Theme, Renderer> {
-    container(
-        column![
-            text("Background color").color(Color::WHITE),
-            button("content").on_press(UIEvent::ButtonPressed)
-        ]
-        .spacing(10),
-    )
+    container(match system_data.current_widget_scene {
+        crate::system::WidgetScene::Loading => loading::view(),
+        crate::system::WidgetScene::RoutineList => routine_list::view(system_data),
+        crate::system::WidgetScene::RoutineDetail(_) => routine_detail::view(system_data),
+        crate::system::WidgetScene::RoutineNew => routine_new::view(),
+    })
     .padding(10)
-    .align_bottom(Fill)
-    .style(transparent_container)
+    .style(default_container_style)
     .into()
 }

@@ -5,7 +5,7 @@ use uiautomation::{UIAutomation, UIElement, UITreeWalker};
 use crate::{contexted_err, SResult};
 
 #[derive(Clone, Debug, Default)]
-pub struct ProcessRootViewElement {
+pub struct RootViewElement {
     pub root_node: ViewElementNode,
     pub process_name: String,
     pub pid: i32,
@@ -25,7 +25,7 @@ pub struct ViewElementNodeInfo {
     pub depth: usize,
 }
 
-pub fn get_processes_root_node() -> SResult<Vec<ProcessRootViewElement>> {
+pub fn get_processes_root_node() -> SResult<Vec<RootViewElement>> {
     // get root ui
     let automation: UIAutomation =
         UIAutomation::new().or_else(|e| contexted_err!("failed get ui viewer", e))?;
@@ -71,7 +71,7 @@ pub fn get_processes_root_node() -> SResult<Vec<ProcessRootViewElement>> {
         let root_element = get_element_recursive(&walker, &process_root_ui_element, 1);
 
         // make root element
-        let process_root = ProcessRootViewElement {
+        let process_root = RootViewElement {
             root_node: root_element,
             process_name: process_name,
             pid: process_id,

@@ -4,7 +4,7 @@ use iced_wgpu::Renderer;
 use iced_winit::core::{Element, Theme};
 use iced_winit::runtime::{Program, Task};
 
-use crate::system::data::SystemData;
+use crate::system::system_data::SystemData;
 use crate::system::UIEvent;
 use crate::ui::root::view;
 
@@ -29,11 +29,12 @@ impl Program for UIContext {
 
     fn update(&mut self, message: UIEvent) -> Task<UIEvent> {
         match message {
-            UIEvent::ButtonPressed => {
-                let mut data_value = self.system_data.lock().expect("failed get arc mutex");
-                data_value.count += 1;
-                self.messages.push(message.clone());
-            }
+            // UIEvent::ButtonPressed => {
+            //     let mut data_value = self.system_data.lock().expect("failed get arc mutex");
+            //     data_value.count += 1;
+            //     self.messages.push(message.clone());
+            // }
+            _ => {}
         }
 
         Task::none()
