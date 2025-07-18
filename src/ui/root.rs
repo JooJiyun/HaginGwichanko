@@ -5,14 +5,14 @@ use iced_winit::core::{Element, Theme};
 use crate::system::data::SystemData;
 use crate::system::UIEvent;
 use crate::ui::styles::default_container_style;
-use crate::ui::{loading, routine_detail, routine_list, routine_new};
+use crate::ui::{loading, routine_detail, routine_list, routine_modify};
 
 pub fn view(system_data: &SystemData) -> Element<'static, UIEvent, Theme, Renderer> {
     container(match system_data.current_widget_scene {
         crate::system::WidgetScene::Loading => loading::view(),
         crate::system::WidgetScene::RoutineList => routine_list::view(system_data),
         crate::system::WidgetScene::RoutineDetail(_) => routine_detail::view(system_data),
-        crate::system::WidgetScene::RoutineNew => routine_new::view(),
+        crate::system::WidgetScene::RoutineNew => routine_modify::view(system_data),
     })
     .padding(10)
     .style(default_container_style)

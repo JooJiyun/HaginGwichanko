@@ -97,8 +97,8 @@ fn run_routine_inner(mut routine_info: RoutineInfo, receiver: Receiver<Terminate
 
 #[derive(Clone, Debug, Default)]
 pub struct ClickPositionInfo {
-    target_position: (i32, i32),
-    mouse_speed: u64,
+    pub target_position: (i32, i32),
+    pub mouse_speed: u64,
 }
 
 impl ClickPositionInfo {
@@ -114,9 +114,9 @@ impl ClickPositionInfo {
 
 #[derive(Clone, Debug)]
 pub struct ClickButtonIfFindInfo {
-    filter: Vec<FilterInfo>,
-    mouse_speed: u64,
-    find_time_limit: u64,
+    pub filter: Vec<FilterInfo>,
+    pub mouse_speed: u64,
+    pub find_time_limit: u64,
 }
 
 impl Default for ClickButtonIfFindInfo {
@@ -131,9 +131,9 @@ impl Default for ClickButtonIfFindInfo {
 
 #[derive(Clone, Debug, Default)]
 pub struct FilterInfo {
-    text: String,
-    depth: u32,
-    index: Option<usize>,
+    pub text: String,
+    pub depth: u32,
+    pub index: Option<usize>,
 }
 
 impl ClickButtonIfFindInfo {

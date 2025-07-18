@@ -1,15 +1,19 @@
 use crate::system::{
-    {routine::RoutineInfo, view::RootViewElement},
     WidgetScene,
+    {routine::RoutineInfo, view::RootViewElement},
 };
 
 #[derive(Clone, Debug, Default)]
 pub struct SystemData {
     pub count: usize,
-    pub view_tree_processes: Vec<RootViewElement>,
+
+    pub current_widget_scene: WidgetScene,
+
     pub routines: Vec<RoutineInfo>,
     pub selected_routine_index: usize,
-    pub current_widget_scene: WidgetScene,
+    pub is_selected_new: bool,
+
+    pub view_tree_processes: Vec<RootViewElement>,
 }
 
 impl SystemData {
