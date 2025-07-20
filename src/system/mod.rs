@@ -1,10 +1,12 @@
+use crate::system::routine::RoutineMethod;
+
 pub mod core;
 pub mod data;
 pub mod routine;
 pub mod single_instance;
 pub mod tray;
 pub mod ui;
-pub mod view;
+pub mod outview;
 
 pub enum AppEvent {
     SystemTrayEvent(tray_icon::menu::MenuEvent),
@@ -15,6 +17,8 @@ pub enum UIEvent {
     OpenWidgetScene(WidgetScene),
 
     RoutineChanged(RoutineChangeEvent, usize),
+    CreateNewRoutine(RoutineMethod),
+
     UpdateViewState,
 }
 
@@ -23,8 +27,8 @@ pub enum WidgetScene {
     #[default]
     Loading,
     RoutineList,
-    RoutineDetail(usize),
-    RoutineNew,
+    RoutineDetail(usize),       // routine index
+    RoutineModify(usize, bool), // routine index, is new routine
 }
 
 impl Into<UIEvent> for WidgetScene {
@@ -35,11 +39,9 @@ impl Into<UIEvent> for WidgetScene {
 
 #[derive(Debug, Clone)]
 pub enum RoutineChangeEvent {
-    Rename(String),
-    Run,
-    Stop,
+    ChangeRunState(bool),
     Delete,
-    SetRunWithStartup(bool),
+    SetRunAtStartup(bool),
 }
 
 impl RoutineChangeEvent {

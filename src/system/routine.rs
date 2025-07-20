@@ -4,6 +4,7 @@ use std::{
     time::Duration,
 };
 
+use iced_widget::pick_list::default;
 use uiautomation::{inputs::Mouse, types::Point};
 use uiautomation::{UIAutomation, UIElement};
 
@@ -27,6 +28,15 @@ pub struct RoutineInfo {
     pub last_loop_interval: u64,
 }
 
+impl RoutineInfo {
+    pub fn new(routine_method: RoutineMethod) -> Self {
+        Self {
+            routin_method: routine_method,
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default)]
 pub enum RoutineMethod {
     #[default]
@@ -42,6 +52,13 @@ impl RoutineMethod {
             RoutineMethod::ClickPosition(_) => "Click Position",
             RoutineMethod::ClickButtonIfFind(_) => "Click Button If Find",
         }
+    }
+
+    pub fn get_defaults() -> Vec<Self> {
+        vec![
+            RoutineMethod::ClickPosition(ClickPositionInfo::default()),
+            RoutineMethod::ClickButtonIfFind(ClickButtonIfFindInfo::default()),
+        ]
     }
 }
 

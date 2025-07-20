@@ -1,29 +1,25 @@
-use iced_widget::{button, column, row, text};
+use iced_widget::{button, column, container, row, text};
 
-use crate::system::data::SystemData;
+use crate::system::data::AppData;
 use crate::system::routine::{ClickButtonIfFindInfo, ClickPositionInfo, RoutineMethod};
-use crate::ui::const_text::*;
 use crate::ui::styles::default_container_style;
+use crate::ui::{const_text::*, AppUIElement};
 
-pub fn view(
-    system_data: &SystemData,
-) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
-    let selected_routine = &system_data.routines[system_data.selected_routine_index];
+pub fn view_routine_detail(system_data: &AppData, routine_index: usize) -> AppUIElement {
+    let selected_routine = &system_data.routines[routine_index];
 
-    iced_widget::container(column![
+    container(column![
         row![button(text(TEXT_MODIFY)), button(text(TEXT_BACK)),],
         text(selected_routine.name.clone()),
-        routine_method_view(&selected_routine.routin_method)
+        view_routine_element(&selected_routine.routin_method)
     ])
     .style(default_container_style)
     .padding(0)
     .into()
 }
 
-fn routine_method_view(
-    routine_method: &RoutineMethod,
-) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
-    iced_widget::container(match routine_method {
+fn view_routine_element(routine_method: &RoutineMethod) -> AppUIElement {
+    container(match routine_method {
         RoutineMethod::None => row![].into(),
         RoutineMethod::ClickPosition(click_position_info) => {
             routine_click_position_view(click_position_info)
@@ -37,10 +33,8 @@ fn routine_method_view(
     .into()
 }
 
-fn routine_click_position_view(
-    click_position_info: &ClickPositionInfo,
-) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
-    iced_widget::container(row![
+fn routine_click_position_view(click_position_info: &ClickPositionInfo) -> AppUIElement {
+    container(row![
         text(click_position_info.mouse_speed),
         text(format!(
             "{}, {}",
@@ -54,7 +48,7 @@ fn routine_click_position_view(
 
 fn routine_click_button_if_find_view(
     click_button_if_find_info: &ClickButtonIfFindInfo,
-) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
+) -> AppUIElement {
     let mut filter_view = column![];
     for (index, filter) in click_button_if_find_info.filter.iter().enumerate() {
         let mut filter_inner_view = row![
@@ -73,7 +67,7 @@ fn routine_click_button_if_find_view(
         }
         filter_view = filter_view.push(filter_inner_view);
     }
-    iced_widget::container(row![
+    container(row![
         text(click_button_if_find_info.mouse_speed.to_string()),
         filter_view,
         text(click_button_if_find_info.find_time_limit.to_string())

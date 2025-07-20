@@ -1,22 +1,18 @@
-use crate::system::{
-    WidgetScene,
-    {routine::RoutineInfo, view::RootViewElement},
-};
+use crate::system::outview::RootViewElement;
+use crate::system::routine::RoutineInfo;
+use crate::system::WidgetScene;
 
 #[derive(Clone, Debug, Default)]
-pub struct SystemData {
-    pub count: usize,
-
+pub struct AppData {
     pub current_widget_scene: WidgetScene,
 
     pub routines: Vec<RoutineInfo>,
-    pub selected_routine_index: usize,
-    pub is_selected_new: bool,
+    pub outview_trees: Vec<RootViewElement>,
 
-    pub view_tree_processes: Vec<RootViewElement>,
+    pub version_info: String,
 }
 
-impl SystemData {
+impl AppData {
     pub fn save(&self) {}
 
     pub fn load() -> Self {

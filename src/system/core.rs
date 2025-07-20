@@ -23,7 +23,7 @@ use iced_winit::winit;
 use iced_winit::Clipboard;
 
 use crate::show_error_with_terminate;
-use crate::system::data::SystemData;
+use crate::system::data::AppData;
 use crate::system::tray::{self, SystemTrayHandle};
 use crate::system::{ui, AppEvent, TerminateThreadEvent};
 
@@ -31,7 +31,7 @@ pub struct App {
     system_tray_handle: tray::SystemTrayHandle,
     visual_state: VisualState,
     routine_senders: Vec<Sender<TerminateThreadEvent>>,
-    data: Arc<Mutex<SystemData>>,
+    data: Arc<Mutex<AppData>>,
 }
 
 enum VisualState {
@@ -44,7 +44,7 @@ enum VisualState {
         format: wgpu::TextureFormat,
         engine: Engine,
         renderer: Renderer,
-        state: program::State<ui::APPUI>,
+        state: program::State<ui::AppUI>,
         cursor_position: Option<winit::dpi::PhysicalPosition<f64>>,
         clipboard: Clipboard,
         viewport: Viewport,
@@ -60,7 +60,7 @@ impl Default for App {
             system_tray_handle: SystemTrayHandle::default(),
             visual_state: VisualState::Hidden,
             routine_senders: vec![],
-            data: Arc::new(Mutex::new(SystemData::default())),
+            data: Arc::new(Mutex::new(AppData::default())),
         }
     }
 }
@@ -252,7 +252,7 @@ impl App {
     fn open(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         let data_value = self.data.lock().expect("main lock");
         {
-            println!("{}", data_value.count);
+            println!("{}", data_value.version_info);
         }
 
         if let VisualState::Shown { .. } = self.visual_state {
@@ -334,7 +334,7 @@ impl App {
         );
 
         // Initialize scene and GUI controls
-        let controls = ui::APPUI::new(self.data.clone());
+        let controls = ui::AppUI::new(self.data.clone());
 
         // Initialize iced
         let mut debug = Debug::new();
