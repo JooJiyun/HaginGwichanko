@@ -1,13 +1,14 @@
+use crate::routine::runner::RoutineRunner;
 use crate::system::outview::RootViewElement;
-use crate::system::routine::RoutineInfo;
 use crate::system::WidgetScene;
 
 #[derive(Clone, Debug, Default)]
 pub struct AppData {
     pub current_widget_scene: WidgetScene,
 
-    pub routines: Vec<RoutineInfo>,
+    pub routines: Vec<RoutineRunner>,
     pub outview_trees: Vec<RootViewElement>,
+    pub tmp_modify_routine: Option<RoutineRunner>,
 
     pub version_info: String,
 }

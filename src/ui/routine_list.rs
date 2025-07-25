@@ -1,16 +1,15 @@
-use iced_core::{Element, Theme};
-use iced_wgpu::Renderer;
 use iced_widget::{button, column, container, row, text};
 
+use crate::routine::method::RoutineMethod;
+use crate::routine::method_button_clicker::MethodButtonClicker;
+use crate::routine::runner::RoutineRunner;
 use crate::system::data::AppData;
-use crate::system::routine::{RoutineInfo, RoutineMethod};
-use crate::system::{RoutineChangeEvent, UIEvent, WidgetScene};
-use crate::ui::const_text::*;
+use crate::system::{UIEvent, WidgetScene};
+use crate::ui::routine_common::view_routine_remote;
 use crate::ui::styles::*;
+use crate::ui::AppUIElement;
 
-pub fn view_routine_list(
-    system_data: &AppData,
-) -> iced_core::Element<'static, crate::system::UIEvent, iced_core::Theme, iced_wgpu::Renderer> {
+pub fn view_routine_list(system_data: &AppData) -> AppUIElement {
     // new buttons
     let mut new_button_list = row![].spacing(5);
     for routine_method in RoutineMethod::get_defaults() {
@@ -28,52 +27,37 @@ pub fn view_routine_list(
         routine_item_list = routine_item_list.push(routine_item_view(routine_info, index));
     }
 
-    iced_widget::container(column![new_button_list, routine_item_list].spacing(5))
-        .style(default_container_style)
-        .padding(5)
-        .into()
+    let test_runner =
+        RoutineRunner::new(RoutineMethod::ButtonClicker(MethodButtonClicker::default()));
+    iced_widget::container(
+        column![
+            new_button_list,
+            routine_item_list,
+            iced_widget::slider(0.0..=100.0, 10., move |_v| {
+                let mut test2 = test_runner.clone();
+                test2.state_is_running = false;
+                UIEvent::UpdateRoutine(0, test2)
+            },)
+        ]
+        .spacing(5),
+    )
+    .style(default_container_style)
+    .padding(5)
+    .into()
 }
 
-fn routine_item_view(
-    routine_info: &RoutineInfo,
-    routine_index: usize,
-) -> Element<'static, UIEvent, Theme, Renderer> {
+fn routine_item_view(routine_info: &RoutineRunner, routine_index: usize) -> AppUIElement {
     container(row![
         button(column![
-            text(routine_info.name.clone()),
+            text(routine_info.routine_name.clone()),
             row![
-                text(routine_info.created_at.clone()),
-                text(routine_info.last_modified.clone()),
+                text(routine_info.time_created_at.clone()),
+                text(routine_info.time_last_modified.clone()),
             ]
         ])
         .style(default_button_style)
         .on_press(WidgetScene::RoutineDetail(routine_index).into()),
-        row![
-            // run at startup
-            if routine_info.run_at_startup {
-                button(text(TEXT_RUN_AT_STARTUP))
-                    .style(green_button_style)
-                    .on_press(RoutineChangeEvent::SetRunAtStartup(true).with_into(routine_index))
-            } else {
-                button(text(TEXT_NOT_RUN_AT_STARTUP))
-                    .style(gray_button_style)
-                    .on_press(RoutineChangeEvent::SetRunAtStartup(false).with_into(routine_index))
-            },
-            // is running
-            if routine_info.is_running {
-                button(text(TEXT_STOP))
-                    .style(red_button_style)
-                    .on_press(RoutineChangeEvent::ChangeRunState(false).with_into(routine_index))
-            } else {
-                button(text(TEXT_RUN))
-                    .style(green_button_style)
-                    .on_press(RoutineChangeEvent::ChangeRunState(true).with_into(routine_index))
-            },
-            // delete
-            button(text(TEXT_DELETE))
-                .style(red_button_style)
-                .on_press(RoutineChangeEvent::Delete.with_into(routine_index)),
-        ]
+        view_routine_remote(routine_info, routine_index),
     ])
     .style(default_container_style)
     .into()

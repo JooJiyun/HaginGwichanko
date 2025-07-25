@@ -1,5 +1,6 @@
 mod loading;
 pub mod root;
+mod routine_common;
 mod routine_detail;
 mod routine_list;
 mod routine_modify;
@@ -17,4 +18,5 @@ mod const_text {
     pub const TEXT_MODIFY: &str = "modify";
     pub const TEXT_DONE: &str = "done";
     pub const TEXT_BACK: &str = "back";
+    pub const TEXT_CANCEL: &str = "cancel";
 }

@@ -1,4 +1,5 @@
-use iced_widget::container;
+use iced_core::Length;
+use iced_widget::{container, scrollable};
 
 use crate::system::data::AppData;
 use crate::system::WidgetScene;
@@ -10,7 +11,7 @@ use crate::ui::styles::default_container_style;
 use crate::ui::AppUIElement;
 
 pub fn view(system_data: &AppData) -> AppUIElement {
-    container(match system_data.current_widget_scene {
+    container(scrollable(match system_data.current_widget_scene {
         WidgetScene::Loading => view_loading(),
         WidgetScene::RoutineList => view_routine_list(system_data),
         WidgetScene::RoutineDetail(routine_index) => {
@@ -19,8 +20,10 @@ pub fn view(system_data: &AppData) -> AppUIElement {
         WidgetScene::RoutineModify(routine_index, is_new_routine) => {
             view_routine_modify(system_data, routine_index, is_new_routine)
         }
-    })
+    }))
     .padding(10)
     .style(default_container_style)
+    .width(Length::Fill)
+    .height(Length::Fill)
     .into()
 }

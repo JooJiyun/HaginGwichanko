@@ -1,25 +1,32 @@
-use crate::system::routine::RoutineMethod;
+use crate::routine::{method::RoutineMethod, runner::RoutineRunner};
 
 pub mod core;
 pub mod data;
-pub mod routine;
+pub mod outview;
 pub mod single_instance;
 pub mod tray;
 pub mod ui;
-pub mod outview;
 
 pub enum AppEvent {
     SystemTrayEvent(tray_icon::menu::MenuEvent),
 }
 
+pub struct TerminateThreadEvent;
+
 #[derive(Debug, Clone)]
 pub enum UIEvent {
     OpenWidgetScene(WidgetScene),
 
-    RoutineChanged(RoutineChangeEvent, usize),
     CreateNewRoutine(RoutineMethod),
+    CancelCreateRoutine,
 
-    UpdateViewState,
+    ChangeRoutineRunState(usize, bool),
+    ChangeRoutineRunAtStartUpState(usize, bool),
+    DeleteRoutine(usize),
+    UpdateRoutine(usize, RoutineRunner),
+    ModifyTempRoutine(RoutineRunner),
+
+    UpdateOutView,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -36,18 +43,3 @@ impl Into<UIEvent> for WidgetScene {
         UIEvent::OpenWidgetScene(self)
     }
 }
-
-#[derive(Debug, Clone)]
-pub enum RoutineChangeEvent {
-    ChangeRunState(bool),
-    Delete,
-    SetRunAtStartup(bool),
-}
-
-impl RoutineChangeEvent {
-    pub fn with_into(&self, index: usize) -> UIEvent {
-        UIEvent::RoutineChanged(self.clone(), index)
-    }
-}
-
-pub struct TerminateThreadEvent;
