@@ -1,9 +1,8 @@
 use tray_icon::menu::{Menu, MenuEvent, MenuItem};
 use tray_icon::{Icon, TrayIcon, TrayIconBuilder, TrayIconEvent};
 
+use crate::system::ICON_PATH;
 use crate::{contexted_err, SResult};
-
-const SYSTEM_TRAY_ICON_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/resources/app-icon.ico");
 
 pub enum SystemTrayEvent {
     Open,
@@ -73,7 +72,7 @@ impl SystemTrayHandle {
 
 fn load_system_tray_icon() -> SResult<Icon> {
     let (icon_rgba, icon_width, icon_height) = {
-        let image = image::open(SYSTEM_TRAY_ICON_PATH)
+        let image = image::open(ICON_PATH)
             .or_else(|e| contexted_err!("failed load system tray icon image", e))?
             .into_rgba8();
         let (width, height) = image.dimensions();

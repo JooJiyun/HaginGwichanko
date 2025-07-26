@@ -24,7 +24,7 @@ use iced_winit::Clipboard;
 use crate::show_error_with_terminate;
 use crate::system::data::AppData;
 use crate::system::tray::{self, SystemTrayHandle};
-use crate::system::{ui, AppEvent, WidgetScene};
+use crate::system::{ui, AppEvent, WidgetScene, ICON_PATH};
 
 pub struct App {
     system_tray_handle: tray::SystemTrayHandle,
@@ -262,7 +262,9 @@ impl App {
             data.current_widget_scene = WidgetScene::RoutineList;
         }
 
-        let mut window_setting = winit::window::WindowAttributes::default();
+        let mut window_setting = winit::window::WindowAttributes::default()
+            .with_title("Hagin Gwichanko")
+            .with_window_icon(load_window_icon());
         window_setting.transparent = true;
 
         let window = Arc::new(
@@ -382,4 +384,19 @@ impl App {
         event_loop.exit();
         std::process::exit(0);
     }
+}
+
+fn load_window_icon() -> Option<winit::window::Icon> {
+    let file = std::fs::File::open(ICON_PATH).ok()?;
+    let mut reader = std::io::BufReader::new(file);
+
+    let icon_dir = ico::IconDir::read(&mut reader).ok()?;
+    let entry = icon_dir.entries().first()?;
+    let decoded = entry.decode().ok()?;
+
+    let width = decoded.width();
+    let height = decoded.height();
+    let rgba = decoded.rgba_data().to_vec(); // Vec<u8>
+
+    winit::window::Icon::from_rgba(rgba, width, height).ok()
 }

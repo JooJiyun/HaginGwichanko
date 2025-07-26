@@ -1,5 +1,3 @@
-use crate::routine::{method::RoutineMethod, runner::RoutineRunner};
-
 pub mod core;
 pub mod data;
 pub mod outview;
@@ -18,14 +16,14 @@ pub struct TerminateThreadEvent;
 pub enum UIEvent {
     OpenWidgetScene(WidgetScene),
 
-    CreateNewRoutine(RoutineMethod),
+    CreateNewRoutine(crate::routine::method::RoutineMethod),
     CancelCreateRoutine,
 
     ChangeRoutineRunState(usize, bool),
     ChangeRoutineRunAtStartUpState(usize, bool),
     DeleteRoutine(usize),
-    UpdateRoutine(usize, RoutineRunner),
-    ModifyTempRoutine(RoutineRunner),
+    UpdateRoutine(usize, crate::routine::runner::RoutineRunner),
+    ModifyTempRoutine(crate::routine::runner::RoutineRunner),
 
     UpdateOutView,
 }
@@ -43,3 +41,5 @@ impl Into<UIEvent> for WidgetScene {
         UIEvent::OpenWidgetScene(self)
     }
 }
+
+const ICON_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/resources/app-icon.ico");

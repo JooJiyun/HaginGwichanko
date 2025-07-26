@@ -62,10 +62,11 @@ impl AppUI {
             | UIEvent::OpenWidgetScene(WidgetScene::RoutineModify(routine_index, _)) => {
                 // valid index check
                 if routine_index >= data_value.routines.len() {
-                    let _errrr: Result<(), (String, String)> = contexted_err!(
+                    let err: Result<(), (String, String)> = contexted_err!(
                         "not exist routine",
                         format!("{:?} {routine_index} not exist routine index", message)
                     );
+                    return err;
                 }
             }
             _ => {}
