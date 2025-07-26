@@ -25,12 +25,12 @@ use iced_winit::Clipboard;
 use crate::show_error_with_terminate;
 use crate::system::data::AppData;
 use crate::system::tray::{self, SystemTrayHandle};
-use crate::system::{ui, AppEvent, TerminateThreadEvent};
+use crate::system::{ui, AppEvent, TerminateThreadEvent, WidgetScene};
 
 pub struct App {
     system_tray_handle: tray::SystemTrayHandle,
     visual_state: VisualState,
-    routine_senders: Vec<Sender<TerminateThreadEvent>>,
+    routine_senders: Vec<(usize, Sender<TerminateThreadEvent>)>,
     data: Arc<Mutex<AppData>>,
 }
 
@@ -204,13 +204,11 @@ impl ApplicationHandler<AppEvent> for App {
                 debug,
             );
 
-            // for message in &state.program().messages {
-            //     match message {
-            //         UIEvent::BackgroundColorChanged() => todo!(),
-            //         UIEvent::InputChanged(_) => todo!(),
-            //         UIEvent::ButtonPressed => println!("#$@#$3"),
-            //     }
-            // }
+            // running state가 바뀐 routine 처리
+            {
+                // let data = self.data.lock().expect("main lock");
+                // for routine_runner in &data.routines {}
+            }
 
             // 다시그리기
             window.request_redraw();
@@ -233,14 +231,13 @@ impl ApplicationHandler<AppEvent> for App {
 
     fn user_event(&mut self, event_loop: &winit::event_loop::ActiveEventLoop, event: AppEvent) {
         match event {
-            AppEvent::SystemTrayEvent(menu_event) => {
-                match self.system_tray_handle.parse_event(menu_event) {
-                    tray::SystemTrayEvent::Open => self.open(event_loop),
-                    tray::SystemTrayEvent::Quit => self.quit(event_loop),
-                    tray::SystemTrayEvent::Start => self.start(),
-                    tray::SystemTrayEvent::Stop => self.stop(),
-                    tray::SystemTrayEvent::Invalid => show_message("", "Warning"),
-                }
+            AppEvent::SystemTrayMenuEvent(menu_event) => {
+                let system_tray_event = self.system_tray_handle.parse_menu_event(menu_event);
+                self.handle_tray_event(system_tray_event, event_loop);
+            }
+            AppEvent::SystemTrayIconEvent(icon_event) => {
+                let system_tray_event = self.system_tray_handle.parse_icon_event(icon_event);
+                self.handle_tray_event(system_tray_event, event_loop);
             }
         }
     }
@@ -249,10 +246,23 @@ impl ApplicationHandler<AppEvent> for App {
 }
 
 impl App {
-    fn open(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        let data_value = self.data.lock().expect("main lock");
+    fn handle_tray_event(
+        &mut self,
+        tray_event: tray::SystemTrayEvent,
+        event_loop: &winit::event_loop::ActiveEventLoop,
+    ) {
+        match tray_event {
+            tray::SystemTrayEvent::Open => self.open_window(event_loop),
+            tray::SystemTrayEvent::Quit => self.quit_process(event_loop),
+            tray::SystemTrayEvent::Invalid => {}
+        }
+    }
+
+    fn open_window(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         {
+            let mut data_value = self.data.lock().expect("main lock");
             println!("{}", data_value.version_info);
+            data_value.current_widget_scene = WidgetScene::Loading;
         }
 
         if let VisualState::Shown { .. } = self.visual_state {
@@ -363,11 +373,16 @@ impl App {
             resized: false,
             debug,
         };
+
+        {
+            let mut data_value = self.data.lock().expect("main lock");
+            data_value.current_widget_scene = WidgetScene::RoutineList;
+        }
     }
 
-    fn quit(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    fn quit_process(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         // thread들 모두 종료
-        for sender in &self.routine_senders {
+        for (_thread_id, sender) in &self.routine_senders {
             if let Err(e) = sender.send(TerminateThreadEvent) {
                 eprintln!("failed send terminate event : {:?}", e);
             }
@@ -377,8 +392,4 @@ impl App {
         event_loop.exit();
         std::process::exit(0);
     }
-
-    fn start(&mut self) {}
-
-    fn stop(&mut self) {}
 }

@@ -8,7 +8,8 @@ pub mod tray;
 pub mod ui;
 
 pub enum AppEvent {
-    SystemTrayEvent(tray_icon::menu::MenuEvent),
+    SystemTrayMenuEvent(tray_icon::menu::MenuEvent),
+    SystemTrayIconEvent(tray_icon::TrayIconEvent),
 }
 
 pub struct TerminateThreadEvent;

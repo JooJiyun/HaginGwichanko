@@ -23,8 +23,15 @@ fn run_main() -> SResult<()> {
 
     let proxy = event_loop.create_proxy();
     tray_icon::menu::MenuEvent::set_event_handler(Some(move |event| {
-        if let Err(e) = proxy.send_event(AppEvent::SystemTrayEvent(event)) {
-            eprintln!("failed proxy send event : {:?}", e.to_string());
+        if let Err(e) = proxy.send_event(AppEvent::SystemTrayMenuEvent(event)) {
+            eprintln!("failed send tray menu proxy event : {:?}", e.to_string());
+        }
+    }));
+
+    let proxy = event_loop.create_proxy();
+    tray_icon::TrayIconEvent::set_event_handler(Some(move |event| {
+        if let Err(e) = proxy.send_event(AppEvent::SystemTrayIconEvent(event)) {
+            eprintln!("failed send tray icon proxy event : {:?}", e.to_string());
         }
     }));
 

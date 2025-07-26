@@ -12,16 +12,12 @@ use crate::ui::root::view;
 use crate::{contexted_err, SResult};
 
 pub struct AppUI {
-    pub messages: Vec<UIEvent>,
     pub system_data: Arc<Mutex<AppData>>,
 }
 
 impl AppUI {
     pub fn new(data: Arc<Mutex<AppData>>) -> AppUI {
-        AppUI {
-            messages: vec![],
-            system_data: data,
-        }
+        AppUI { system_data: data }
     }
 }
 

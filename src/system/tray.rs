@@ -1,7 +1,5 @@
-use tray_icon::{
-    menu::{Menu, MenuEvent, MenuItem},
-    Icon, TrayIcon, TrayIconBuilder,
-};
+use tray_icon::menu::{Menu, MenuEvent, MenuItem};
+use tray_icon::{Icon, TrayIcon, TrayIconBuilder, TrayIconEvent};
 
 use crate::{contexted_err, SResult};
 
@@ -10,8 +8,6 @@ const SYSTEM_TRAY_ICON_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/resour
 pub enum SystemTrayEvent {
     Open,
     Quit,
-    Start,
-    Stop,
     Invalid,
 }
 
@@ -19,8 +15,6 @@ pub struct SystemTrayHandle {
     pub tray_icon: Option<TrayIcon>,
     pub open_menu_item: MenuItem,
     pub quit_menu_item: MenuItem,
-    pub start_menu_item: MenuItem,
-    pub stop_menu_item: MenuItem,
 }
 
 impl Default for SystemTrayHandle {
@@ -29,8 +23,6 @@ impl Default for SystemTrayHandle {
             tray_icon: None,
             open_menu_item: MenuItem::new("open", true, None),
             quit_menu_item: MenuItem::new("exit", true, None),
-            start_menu_item: MenuItem::new("start", true, None),
-            stop_menu_item: MenuItem::new("stop", false, None),
         }
     }
 }
@@ -40,18 +32,15 @@ impl SystemTrayHandle {
         let icon = load_system_tray_icon()?;
 
         let menu = Menu::new();
-        menu.append_items(&[
-            &self.open_menu_item,
-            &self.quit_menu_item,
-            &self.start_menu_item,
-        ])
-        .or_else(|e| contexted_err!("failed system tray menu", e))?;
+        menu.append_items(&[&self.open_menu_item, &self.quit_menu_item])
+            .or_else(|e| contexted_err!("failed system tray menu", e))?;
 
         self.tray_icon = Some(
             TrayIconBuilder::new()
                 .with_menu(Box::new(menu))
                 .with_icon(icon)
-                .with_title("netflix-skip-intro")
+                .with_title("hagin-gwichanko")
+                .with_menu_on_left_click(false)
                 .build()
                 .or_else(|e| contexted_err!("failed create system tray builder", e))?,
         );
@@ -59,28 +48,26 @@ impl SystemTrayHandle {
         Ok(())
     }
 
-    /// menu event가 SystemTrayEvent 중 어떤 이벤트인지만 반환.
-    ///
-    /// menu item의 valid 상태를 바꾸지 않음!
-    pub fn parse_event(&self, menu_event: MenuEvent) -> SystemTrayEvent {
+    pub fn parse_menu_event(&self, menu_event: MenuEvent) -> SystemTrayEvent {
         if menu_event.id() == self.open_menu_item.id() {
             return SystemTrayEvent::Open;
         }
         if menu_event.id() == self.quit_menu_item.id() {
             return SystemTrayEvent::Quit;
         }
-        if menu_event.id() == self.start_menu_item.id() {
-            return SystemTrayEvent::Start;
-        }
-        if menu_event.id() == self.stop_menu_item.id() {
-            return SystemTrayEvent::Stop;
-        }
         return SystemTrayEvent::Invalid;
     }
 
-    pub fn set_menu_state(&mut self, running: bool) {
-        self.start_menu_item.set_enabled(!running);
-        self.stop_menu_item.set_enabled(running);
+    pub fn parse_icon_event(&self, icon_event: TrayIconEvent) -> SystemTrayEvent {
+        match icon_event {
+            TrayIconEvent::DoubleClick {
+                id: _,
+                position: _,
+                rect: _,
+                button: _,
+            } => SystemTrayEvent::Open,
+            _ => SystemTrayEvent::Invalid,
+        }
     }
 }
 

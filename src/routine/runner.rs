@@ -20,6 +20,7 @@ pub struct RoutineRunner {
 
     pub loop_interval: u64,
     tmp_last_loop_interval: u64,
+    pub thread_id: usize,
 }
 
 impl RoutineRunner {
@@ -36,6 +37,7 @@ impl RoutineRunner {
 
             loop_interval: LOOP_INTERVAL_UNIT,
             tmp_last_loop_interval: LOOP_INTERVAL_UNIT,
+            thread_id: 0,
         }
     }
 }
