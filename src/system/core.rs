@@ -1,5 +1,4 @@
 use std::process;
-use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
 use winit::application::ApplicationHandler;
@@ -25,12 +24,11 @@ use iced_winit::Clipboard;
 use crate::show_error_with_terminate;
 use crate::system::data::AppData;
 use crate::system::tray::{self, SystemTrayHandle};
-use crate::system::{ui, AppEvent, TerminateThreadEvent, WidgetScene};
+use crate::system::{ui, AppEvent, WidgetScene};
 
 pub struct App {
     system_tray_handle: tray::SystemTrayHandle,
     visual_state: VisualState,
-    routine_senders: Vec<(usize, Sender<TerminateThreadEvent>)>,
     data: Arc<Mutex<AppData>>,
 }
 
@@ -59,7 +57,6 @@ impl Default for App {
         App {
             system_tray_handle: SystemTrayHandle::default(),
             visual_state: VisualState::Hidden,
-            routine_senders: vec![],
             data: Arc::new(Mutex::new(AppData::default())),
         }
     }
@@ -204,12 +201,6 @@ impl ApplicationHandler<AppEvent> for App {
                 debug,
             );
 
-            // running state가 바뀐 routine 처리
-            {
-                // let data = self.data.lock().expect("main lock");
-                // for routine_runner in &data.routines {}
-            }
-
             // 다시그리기
             window.request_redraw();
         }
@@ -267,8 +258,8 @@ impl App {
 
         // 새 윈도우의 시작화면은 routine list
         {
-            let mut data_value = self.data.lock().expect("main lock");
-            data_value.current_widget_scene = WidgetScene::RoutineList;
+            let mut data = self.data.lock().expect("main lock");
+            data.current_widget_scene = WidgetScene::RoutineList;
         }
 
         let mut window_setting = winit::window::WindowAttributes::default();
@@ -379,9 +370,11 @@ impl App {
 
     fn quit_process(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         // thread들 모두 종료
-        for (_thread_id, sender) in &self.routine_senders {
-            if let Err(e) = sender.send(TerminateThreadEvent) {
-                eprintln!("failed send terminate event : {:?}", e);
+        {
+            let mut data = self.data.lock().expect("main lock");
+
+            for routine in data.routines.iter_mut() {
+                routine.stop();
             }
         }
 

@@ -2,6 +2,7 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
 
+use crate::contexted_err;
 use crate::routine::method::RoutineMethod;
 use crate::system::TerminateThreadEvent;
 
@@ -15,12 +16,11 @@ pub struct RoutineRunner {
     pub time_created_at: String,
     pub time_last_modified: String,
 
-    pub state_is_running: bool,
-    pub state_run_at_startup: bool,
+    pub run_at_startup: bool,
 
     pub loop_interval: u64,
     tmp_last_loop_interval: u64,
-    pub thread_id: usize,
+    thread_sender: Option<Sender<TerminateThreadEvent>>,
 }
 
 impl RoutineRunner {
@@ -32,17 +32,54 @@ impl RoutineRunner {
             time_created_at: String::new(),
             time_last_modified: String::new(),
 
-            state_is_running: false,
-            state_run_at_startup: false,
+            run_at_startup: false,
 
             loop_interval: LOOP_INTERVAL_UNIT,
             tmp_last_loop_interval: LOOP_INTERVAL_UNIT,
-            thread_id: 0,
+            thread_sender: None,
         }
+    }
+
+    pub fn is_running(&self) -> bool {
+        match &self.thread_sender {
+            Some(_) => true,
+            None => false,
+        }
+    }
+
+    pub fn run(&mut self) {
+        match &self.thread_sender {
+            Some(_) => {}
+            None => {
+                let sender = run_routine(self.clone());
+                self.thread_sender = Some(sender);
+                println!("success start <{}> thread", self.routine_name);
+            }
+        }
+    }
+
+    pub fn stop(&mut self) {
+        match &self.thread_sender {
+            Some(sender) => {
+                let send_result = sender
+                    .send(TerminateThreadEvent)
+                    .or_else(|e| contexted_err!("failed send thread terminate event", e));
+                match send_result {
+                    Ok(_) => {
+                        println!("success terminate <{}> thread", self.routine_name);
+                    }
+                    Err((msg, e)) => {
+                        eprintln!("{} {}", e, msg);
+                    }
+                }
+            }
+            None => {}
+        }
+        self.thread_sender = None;
     }
 }
 
-pub fn run_routine(routine_info: RoutineRunner) -> Sender<TerminateThreadEvent> {
+fn run_routine(routine_info: RoutineRunner) -> Sender<TerminateThreadEvent> {
     let (sender, receiver) = channel::<TerminateThreadEvent>();
 
     let thread_builder = thread::Builder::new().name(routine_info.routine_name.clone());

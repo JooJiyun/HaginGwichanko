@@ -9,7 +9,7 @@ use crate::ui::AppUIElement;
 pub fn view_routine_remote(routine_info: &RoutineRunner, routine_index: usize) -> AppUIElement {
     row![
         // state run at startup
-        if routine_info.state_run_at_startup {
+        if routine_info.run_at_startup {
             button(text(TEXT_NOT_RUN_AT_STARTUP))
                 .style(gray_button_style)
                 .on_press(UIEvent::ChangeRoutineRunAtStartUpState(
@@ -22,7 +22,7 @@ pub fn view_routine_remote(routine_info: &RoutineRunner, routine_index: usize) -
                 .on_press(UIEvent::ChangeRoutineRunAtStartUpState(routine_index, true))
         },
         // run or stop
-        if routine_info.state_is_running {
+        if routine_info.is_running() {
             button(text(TEXT_STOP))
                 .style(red_button_style)
                 .on_press(UIEvent::ChangeRoutineRunState(routine_index, false))

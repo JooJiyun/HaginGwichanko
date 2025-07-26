@@ -1,7 +1,6 @@
 use iced_widget::{button, column, container, row, text};
 
 use crate::routine::method::RoutineMethod;
-use crate::routine::method_button_clicker::MethodButtonClicker;
 use crate::routine::runner::RoutineRunner;
 use crate::system::data::AppData;
 use crate::system::{UIEvent, WidgetScene};
@@ -27,23 +26,10 @@ pub fn view_routine_list(system_data: &AppData) -> AppUIElement {
         routine_item_list = routine_item_list.push(routine_item_view(routine_info, index));
     }
 
-    let test_runner =
-        RoutineRunner::new(RoutineMethod::ButtonClicker(MethodButtonClicker::default()));
-    iced_widget::container(
-        column![
-            new_button_list,
-            routine_item_list,
-            iced_widget::slider(0.0..=100.0, 10., move |_v| {
-                let mut test2 = test_runner.clone();
-                test2.state_is_running = false;
-                UIEvent::UpdateRoutine(0, test2)
-            },)
-        ]
-        .spacing(5),
-    )
-    .style(default_container_style)
-    .padding(5)
-    .into()
+    iced_widget::container(column![new_button_list, routine_item_list].spacing(5))
+        .style(default_container_style)
+        .padding(5)
+        .into()
 }
 
 fn routine_item_view(routine_info: &RoutineRunner, routine_index: usize) -> AppUIElement {

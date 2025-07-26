@@ -1,14 +1,6 @@
-use std::sync::atomic::{AtomicUsize, Ordering};
-
 use crate::routine::runner::RoutineRunner;
 use crate::system::outview::RootViewElement;
 use crate::system::WidgetScene;
-
-static ROUTINE_THREAD_ATOMIC_ID: AtomicUsize = AtomicUsize::new(1);
-
-pub fn generate_new_routine_thread_id() -> usize {
-    ROUTINE_THREAD_ATOMIC_ID.fetch_add(1, Ordering::Relaxed)
-}
 
 #[derive(Clone, Debug, Default)]
 pub struct AppData {

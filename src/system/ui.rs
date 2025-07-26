@@ -100,16 +100,22 @@ impl AppUI {
                 data_value.outview_trees = get_processes_root_node()?;
             }
             UIEvent::ChangeRoutineRunState(routine_index, is_running) => {
-                data_value.routines[routine_index].state_is_running = is_running;
+                if is_running {
+                    data_value.routines[routine_index].run();
+                } else {
+                    data_value.routines[routine_index].stop();
+                }
             }
             UIEvent::ChangeRoutineRunAtStartUpState(routine_index, state) => {
-                data_value.routines[routine_index].state_run_at_startup = state;
+                data_value.routines[routine_index].run_at_startup = state;
             }
             UIEvent::DeleteRoutine(routine_index) => {
+                data_value.routines[routine_index].stop();
                 data_value.routines.remove(routine_index);
                 data_value.current_widget_scene = WidgetScene::RoutineList;
             }
             UIEvent::UpdateRoutine(routine_index, routine_info) => {
+                data_value.routines[routine_index].stop();
                 data_value.routines[routine_index] = routine_info;
                 data_value.tmp_modify_routine = None;
             }
