@@ -33,7 +33,6 @@ pub enum UIEvent {
 #[derive(Debug, Clone, Default)]
 pub enum WidgetScene {
     #[default]
-    Loading,
     RoutineList,
     RoutineDetail(usize),       // routine index
     RoutineModify(usize, bool), // routine index, is new routine

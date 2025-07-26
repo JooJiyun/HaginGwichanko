@@ -217,7 +217,7 @@ impl ApplicationHandler<AppEvent> for App {
 
     fn new_events(
         &mut self,
-        _event_loop: &winit::event_loop::ActiveEventLoop,
+        event_loop: &winit::event_loop::ActiveEventLoop,
         cause: winit::event::StartCause,
     ) {
         if winit::event::StartCause::Init == cause {
@@ -226,6 +226,7 @@ impl ApplicationHandler<AppEvent> for App {
                 show_message(&msg, "Error");
                 process::exit(1);
             }
+            self.open_window(event_loop);
         }
     }
 
@@ -259,14 +260,15 @@ impl App {
     }
 
     fn open_window(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        {
-            let mut data_value = self.data.lock().expect("main lock");
-            println!("{}", data_value.version_info);
-            data_value.current_widget_scene = WidgetScene::Loading;
-        }
-
+        // 이미 윈도우가 띄워져 있는 경우는 패스
         if let VisualState::Shown { .. } = self.visual_state {
             return;
+        }
+
+        // 새 윈도우의 시작화면은 routine list
+        {
+            let mut data_value = self.data.lock().expect("main lock");
+            data_value.current_widget_scene = WidgetScene::RoutineList;
         }
 
         let mut window_setting = winit::window::WindowAttributes::default();
@@ -373,11 +375,6 @@ impl App {
             resized: false,
             debug,
         };
-
-        {
-            let mut data_value = self.data.lock().expect("main lock");
-            data_value.current_widget_scene = WidgetScene::RoutineList;
-        }
     }
 
     fn quit_process(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
